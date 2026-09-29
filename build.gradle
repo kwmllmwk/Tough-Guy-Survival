@@ -1,0 +1,48 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+version = '1.0.0'
+group = 'com.mengnan'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+}
+
+neoForge {
+    version = '26.3.0.23-beta'
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        mengnansurvival {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// 把项目根目录的 README.md 与 LICENSE 一并打进 jar（放在 jar 根目录）。
+// - README.md：模组会在玩家第一次进入世界时读取它，生成一本名为 README 的成书。
+// - LICENSE：GPL-3.0 要求分发时附带完整许可证全文。
+tasks.named('processResources', ProcessResources) {
+    from(rootProject.file('README.md')) {
+        into ''
+    }
+    from(rootProject.file('LICENSE')) {
+        into ''
+    }
+}
