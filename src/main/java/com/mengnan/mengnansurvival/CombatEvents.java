@@ -20,6 +20,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -112,24 +113,33 @@ public final class CombatEvents {
                     }
                 }
 
-                // 【15】猪灵：即使玩家穿金装也主动攻击
-                if (piglinIgnoreGold) {
-                    boolean angered = false;
-                    for (Piglin piglin : level.getEntitiesOfClass(
-                            Piglin.class, player.getBoundingBox().inflate(piglinRange))) {
-                        if (!piglin.isAlive()) {
-                            continue;
-                        }
-                        // 原版会因金装把玩家从目标记忆中排除，导致相关事件根本不触发；
-                        // 这里直接设置攻击目标，绕过那套记忆。
-                        if (piglin.getTarget() != player) {
-                            piglin.setTarget(player);
-                        }
-                        angered = true;
+                // 【15】猪灵：与末影人完全相同的「靠近即敌对」机制
+                // 原版猪灵靠「玩家没穿金装」的记忆来选目标，穿金装时根本不会进入战斗，
+                // 因此这里像处理末影人一样，直接把附近猪灵的攻击目标设为玩家。
+                for (Piglin piglin : level.getEntitiesOfClass(
+                        Piglin.class, player.getBoundingBox().inflate(piglinRange))) {
+                    if (!piglin.isAlive()) {
+                        continue;
                     }
-                    // 让附近的猪灵一起被激怒，更接近原版行为（每个玩家只调用一次）
-                    if (angered && PiglinAi.isWearingSafeArmor(player)) {
-                        PiglinAi.angerNearbyPiglins(level, player, false);
+                    // 关闭「无视金装」时，穿金装的玩家保持中立（恢复原版行为）
+                    if (!piglinIgnoreGold && PiglinAi.isWearingSafeArmor(player)) {
+                        continue;
+                    }
+                    if (piglin.getTarget() != player) {
+                        piglin.setTarget(player);
+                    }
+                }
+
+                // 【15】僵尸猪灵：同样使用与末影人一致的「靠近即敌对」距离。
+                // 原版僵尸猪灵是中立生物（只有被攻击才反击），这里改为主动敌对。
+                // 它们并不在意金装，所以不受「无视金装」开关影响。
+                for (ZombifiedPiglin zombified : level.getEntitiesOfClass(
+                        ZombifiedPiglin.class, player.getBoundingBox().inflate(piglinRange))) {
+                    if (!zombified.isAlive()) {
+                        continue;
+                    }
+                    if (zombified.getTarget() != player) {
+                        zombified.setTarget(player);
                     }
                 }
             }

@@ -3,17 +3,20 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.146'
 }
 
-version = '1.0.0'
+version = '1.0.3'
 group = 'com.mengnan'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// 本模组的目标平台是 Minecraft 26.3，其源码使用 Java 25 的未命名变量语法，
+// 因此工具链必须是 Java 25（写 21 会编译失败）。
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
     mavenCentral()
 }
 
 neoForge {
-    version = '26.3.0.23-beta'
+    // 与实例实际运行的 NeoForge 版本保持一致（见启动参数 --fml.neoForgeVersion）
+    version = '26.3.0.35-beta'
 
     runs {
         client {

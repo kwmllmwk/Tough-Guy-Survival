@@ -5,11 +5,11 @@ issueTrackerURL = "https://example.com/issues"
 
 [[mods]]
 modId = "mengnansurvival"
-version = "1.0.0"
+version = "1.0.3"
 displayName = "猛男生存 (Mengnan Survival)"
 description = '''
 籽岷《猛男生存》数据包的高版本 NeoForge 移植版。
-包含 34 项残酷的生存改动，所有概率均可在游戏内的配置界面调整。
+包含 48 项残酷的生存改动，所有概率均可在游戏内的配置界面调整。
 本模组以 GNU GPL v3.0 授权，完整条款见 LICENSE。
 '''
 

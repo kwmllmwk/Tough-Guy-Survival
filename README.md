@@ -25,12 +25,13 @@
 | 7 | 受到伤害 | 随机掉落 **1 格**物品；带 **10 刻冷却**，防止着火等持续伤害瞬间清空背包 | ✅ |
 | 8 | 行走 / 疾跑 / 跳跃 / 划船 | 每 **5~15 秒**随机掉落 1 格物品（按实际位移判定移动） | ✅ |
 | 9 | 穿铁套或钻石套 | 获得**缓慢 I** | ✅ |
-| 10 | 穿过地狱门 | **1/2** 概率地狱门损坏（清除传送门方块，保留黑曜石框架） | ✅ |
+| 10 | 穿过地狱门 | **1/4** 概率地狱门损坏；**出发侧与到达侧的门会一起碎**（清除传送门方块，保留黑曜石框架）。仅下界传送生效 | ✅ |
 | 11 | 末影人死亡 | 生成 **3 只末影螨** | ✅ |
+| 11b | 使用末影珍珠 | 传送后在**落点**生成 **1 只末影螨** | ✅ |
 | 12 | 玩家死亡 | 原地生成戴**皮革头盔**、以玩家命名的僵尸 | ✅ |
 | 13 | 可装备生物生成 | 自带装备概率提高，且**已有装备必定附魔**（不凭空新增装备） | ✅ |
 | 14 | 雷暴天气 | 骷髅陷阱马概率提升、骷髅概率下降；并会主动在玩家附近生成骷髅陷阱马 | ✅ |
-| 15 | 穿戴金制装备 | 猪灵**依然**主动攻击玩家（绕过原版的金装记忆判定） | ✅ |
+| 15 | 猪灵 / 僵尸猪灵 | 拥有与**末影人完全相同**的「靠近即敌对」机制：玩家进入 16 格内立刻被锁定为目标。猪灵**穿金装也不例外**；僵尸猪灵原本中立，现在同样主动敌对 | ✅ |
 | 16 | 夜晚 | 无论上次何时睡觉，幻翼都**必定**正常生成 | ✅ |
 | 17 | 灾厄巡逻队 | 额外生成**幻术师** | ✅ |
 | 18 | 玩家靠近猪 | 猪变成**疣猪兽**，原掉落物**立即清除** | ✅ |
@@ -38,7 +39,7 @@
 | 20 | 分解原木 | 只产出 **2 个木板**（由随附的配方文件实现，见第三节） | ❌ |
 | 21 | 玩家周围 64 格内的敌对生物 | 获得**力量 I**（1 小时，持续刷新） | ✅ |
 | 22 | 氧气耗尽窒息 | 获得**凋零 I + 失明 I + 反胃 I** | ✅ |
-| 23 | 与末影人距离 < 10 格 | **直接激怒**末影人 | ✅ |
+| 23 | 与末影人距离 < 16 格 | **直接激怒**末影人 | ✅ |
 | 24 | 手持岩浆桶 | 会被**点燃** | ✅ |
 | 24b | 背包 / 快捷栏中有水桶 | 移动时按概率**倒出**（脚下生成水源，该水桶变空桶） | ✅ |
 | 25 | 进入试炼密室 | 每 **9 秒**获得 **10 秒**不祥之兆 | ✅ |
@@ -52,6 +53,20 @@
 | 32 | 铁 / 铜 / 青金石矿石 | 石镐及以下**无法采集**，必须用**铜镐**或更高级（挖掉但不掉落） | ✅ |
 | 33 | 天气 | 只要在下雨，就**必定**是雷暴 | ✅ |
 | 34 | 初次进入世界 | 获得一本成书：书名 `README`、作者 `DeepSeek-V4.1-Flash`、内容为本 README；每个玩家只发一次 | ✅ |
+| 35 | 制作盾牌 | 成品只有**一半耐久**（168 / 336），由随附的配方文件实现（见第三节） | ❌ |
+| 36 | 僵尸出生 | 若头部为空，戴上一顶**皮革帽子** | ✅ |
+| 37 | 划船 / 木筏 | 持续获得**饥饿 I** | ✅ |
+| 38 | 岩浆 | 持续尝试点燃周围四格方块的**上表面**（玩家附近范围内） | ✅ |
+| 39 | 末影水晶 | **免疫箭矢**（三叉戟、近战、爆炸仍然有效） | ✅ |
+| 40 | 下界的炼药锅 | **无法储水**，只能储岩浆与细雪 | ✅ |
+| 41 | 蜘蛛出生 | 自带 **1 小时隐身**（含洞穴蜘蛛） | ✅ |
+| 42 | 手持烈焰粉 / 烈焰棒 | 会被**点燃**（与手持岩浆桶一致） | ✅ |
+| 43 | 女巫 | 投掷的药水会额外变成**凋零 / 盘丝 / 渗浆 / 虫蚀**（各 1/4） | ✅ |
+| 44 | 末影人 | 每 **40 刻**摧毁**头部正前方**的方块（沿视线探测，不掉落物） | ✅ |
+| 45 | 骷髅出生 | 若头部为空，戴上**下界合金头盔**（含流浪者 / 沼骸 / 凋灵骷髅） | ✅ |
+| 46 | 吃生肉 | 牛肉 / 猪排 / 鸡肉 / 羊肉 / 兔肉 都会带来**饥饿 I、30 秒**（与腐肉完全一致） | ✅ |
+| 47 | 完成睡眠 | 除生成幻翼外，还获得 **10 秒失明 + 20 秒缓慢** | ✅ |
+| 48 | 恶魂火球 | 击中任何东西后，在落点生成一只**已点燃的闪电苦力怕** | ✅ |
 
 ### 两点实现细节（想自己改动时看）
 
@@ -98,6 +113,7 @@
 | 9 | `general.armorSlow.amplifier` | `0` |
 | 10 | `general.portal.breakChance` | `0.5` |
 | 11 | `general.endermite.count` | `3` |
+| 11b | `general.enderPearl.endermiteCount` / `respectPeaceful` | `1` / `true` |
 | 12 | `general.corpse.enabled` | `true` |
 | 13 | `general.mobGear.spawnChanceMultiplier` / `enchantChance` | `3.0` / `1.0` |
 | 14 | `general.thunder.skeletonTrapMultiplier` / `skeletonSpawnMultiplier` | `8.0` / `0.25` |
@@ -108,7 +124,7 @@
 | 19 | `general.transform.farmAnimalToRabbitRange` | `8.0` |
 | 21 | `general.hostile.strengthAmplifier` / `strengthRange` / `strengthDurationTicks` | `0` / `64.0` / `72000` |
 | 22 | `general.drown.witherDurationTicks` / `blindnessDurationTicks` / `nauseaDurationTicks` | `200` / `200` / `200` |
-| 23 | `general.enderman.angerRange` | `10.0` |
+| 23 | `general.enderman.angerRange` | `16.0` |
 | 24 | `general.bucket.lavaBucketIgnites` / `waterSpillChancePerTick` | `true` / `0.004` |
 | 25 | `general.trialChamber.intervalTicks` / `durationTicks` | `180` / `200` |
 | 26 | `general.lightning.targetPlayer` / `rodRange` / `strikeIntervalTicks` | `true` / `128` / `100` |
@@ -121,6 +137,19 @@
 | 32 | `general.mining.copperTierForIronOre` | `true` |
 | 33 | `general.weather.thunderWhileRaining` | `true` |
 | 34 | `general.welcomeBook.enabled` | `true` |
+| 36 | `general.zombieCap.enabled` | `true` |
+| 37 | `general.boatHunger.enabled` / `amplifier` | `true` / `0` |
+| 38 | `general.lavaIgnite.enabled` / `intervalTicks` / `range` | `true` / `20` / `5` |
+| 39 | `general.endCrystal.arrowProof` | `true` |
+| 40 | `general.netherCauldron.noWater` | `true` |
+| 41 | `general.spiderInvisibility.enabled` / `durationTicks` | `true` / `72000` |
+| 42 | `general.blazeItems.enabled` | `true` |
+| 43 | `general.witchPotion.extraPotionChance` | `0.5` |
+| 44 | `general.endermanBreak.enabled` / `intervalTicks` / `range` | `true` / `40` / `3.0` |
+| 45 | `general.skeletonHelmet.enabled` | `true` |
+| 46 | `general.rawMeatHunger.enabled` / `durationTicks` / `amplifier` | `true` / `600` / `0` |
+| 47 | `general.sleepPenalty.enabled` / `blindnessTicks` / `slowTicks` | `true` / `200` / `400` |
+| 48 | `general.ghastFireball.enabled` | `true` |
 
 **关闭某项的办法**：概率类设 `0.0`；开关类设 `false`；倍率类设 `1.0`；权重类设 `0`。
 **恢复原版**：第 30 项设为 `NORMAL`；第 32 项设为 `false`。
@@ -142,15 +171,23 @@
 
 ## 安装
 
-1. 装好 **Minecraft 26.3** 与 **NeoForge 26.3.0.23-beta 或更高**；
-2. 把 `mengnansurvival-1.0.0.jar` 放进 `.minecraft/mods/`（**服务端也要放**）。
+1. 装好 **Minecraft 26.3** 与 **NeoForge 26.3.0.35-beta 或更高**（模组依赖范围写作 `[26.3.0.0-beta,)`）；
+2. 把 `mengnansurvival-1.0.3.jar` 放进 `.minecraft/mods/`（**服务端也要放**）。
 
-## 第 20 项：原木只出 2 个木板
+## 配方类改动（第 20、35 项）
 
-由 jar 内 **12 个配方文件**实现（`data/minecraft/recipe/*_planks.json`），覆盖全部原木种类，
-产出统一为 2。竹子木板来自竹块而非原木，保持原版。
+这两项由 jar 内的配方文件实现，因此**不在**配置界面里：
 
-配方是数据驱动的，所以这一项**不在**配置界面里；要改回 4，删掉 jar 内对应的 `data/` 目录即可。
+| 项 | 文件 | 做法 |
+|---|---|---|
+| 20 | `data/minecraft/recipe/*_planks.json`（12 个） | 把所有「原木 → 木板」配方的产出改成 **2**。竹子木板来自竹块而非原木，保持原版 |
+| 35 | `data/minecraft/recipe/shield.json` | 配方结果附带 `minecraft:damage = 168`，于是做出来的盾牌**只剩一半耐久**（336 的一半） |
+
+想恢复原版，删掉 jar 内对应的 `data/` 目录即可。
+
+> 顺带说明为什么用配方而不是事件：NeoForge 26.3 里 `PlayerEvent.ItemCraftedEvent`
+> 这个类虽然还存在，但**已经没有任何地方触发它**（整个游戏代码里零引用），
+> 所以「合成完成事件」在当前版本是不可用的，改配方才是可靠做法。
 
 ## 第 34 项：赠书的分页
 
@@ -187,6 +224,16 @@ NeoForge 26.3 中 `FinalizeSpawnEvent` **只在刷怪笼生成生物时触发**�
 | `ItemTags.BOWS` | `ItemTags.BOW_ENCHANTABLE` |
 | `Blocks.LIGHTNING_ROD` / `EXPOSED_COPPER` | `BlockTags.LIGHTNING_RODS` / `BlockTags.COPPER` |
 | `EnderMan` | `Enderman` |
+| `ModConfig.Type.COMMON` | `ModConfig.Type.LOCAL`（见下） |
+
+> **配置类型改名，本模组已做兼容**：FancyModLoader 12.0.8（NeoForge 26.3.0.37-beta 起）把
+> `ModConfig.Type` 的取值改成了 `LOCAL / CLIENT / SYNCED / STARTUP`，
+> 旧的 `COMMON` / `SERVER` 被删除；12.0.7 及更早（26.3.0.35-beta 及更早）仍是旧名字。
+>
+> 由于在字节码里写死常量会导致换版本就 `NoSuchFieldError` 崩溃，
+> 本模组改为**按名字反射查找**该类型（先找 `COMMON`，找不到再找 `LOCAL`），
+> 因此**同一份 jar 在新旧 NeoForge 上都能运行**。
+> 配置文件名也显式固定为 `mengnansurvival-common.toml`，不随版本变化。
 
 ## 代码维护说明
 
@@ -202,6 +249,9 @@ src/main/java/com/mengnan/mengnansurvival/
 ├── CombatEvents.java       闪电苦力怕、猪灵、末影人、落雷、雨天雷暴
 ├── HomingProjectiles.java  追踪弹射物 + 避雷针判定
 ├── MobGear.java            生物装备附魔强化
+├── ExtraEvents.java        第三批玩法：僵尸帽子、划船饥饿、岩浆放火、水晶免疫箭矢、
+│                           下界炼药锅、蜘蛛隐身、末影人破坏方块、女巫药水、骷髅头盔
+├── MSPotions.java          自定义药水（凋零药水，Java 版原版没有）
 └── WelcomeBook.java        README 成书（含分页逻辑）
 ```
 

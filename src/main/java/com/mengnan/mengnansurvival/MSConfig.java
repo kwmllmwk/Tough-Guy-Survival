@@ -80,6 +80,8 @@ public final class MSConfig {
         public final ModConfigSpec.IntValue armorSlowAmplifier;
         public final ModConfigSpec.DoubleValue portalBreakChance;
         public final ModConfigSpec.IntValue endermiteCount;
+        public final ModConfigSpec.IntValue enderPearlEndermiteCount;
+        public final ModConfigSpec.BooleanValue enderPearlRespectPeaceful;
         public final ModConfigSpec.BooleanValue corpseZombieEnabled;
 
         public final ModConfigSpec.DoubleValue mobArmorChanceMultiplier;
@@ -135,6 +137,33 @@ public final class MSConfig {
 
         public final ModConfigSpec.BooleanValue copperTierForIronOre;
         public final ModConfigSpec.BooleanValue giveWelcomeBook;
+
+        // ---- 第三批新增（36~45）----
+        public final ModConfigSpec.BooleanValue zombieLeatherCap;
+        public final ModConfigSpec.BooleanValue boatHungerEnabled;
+        public final ModConfigSpec.IntValue boatHungerAmplifier;
+        public final ModConfigSpec.BooleanValue lavaIgniteEnabled;
+        public final ModConfigSpec.IntValue lavaIgniteIntervalTicks;
+        public final ModConfigSpec.IntValue lavaIgniteRange;
+        public final ModConfigSpec.BooleanValue endCrystalArrowProof;
+        public final ModConfigSpec.BooleanValue netherNoWaterCauldron;
+        public final ModConfigSpec.BooleanValue spiderInvisibilityEnabled;
+        public final ModConfigSpec.IntValue spiderInvisibilityTicks;
+        public final ModConfigSpec.BooleanValue blazeItemsIgnite;
+        public final ModConfigSpec.BooleanValue endermanBreakBlocks;
+        public final ModConfigSpec.IntValue endermanBreakIntervalTicks;
+        public final ModConfigSpec.DoubleValue endermanBreakRange;
+        public final ModConfigSpec.DoubleValue witchExtraPotionChance;
+        public final ModConfigSpec.BooleanValue skeletonNetheriteHelmet;
+
+        // ---- 第四批新增（46~48）----
+        public final ModConfigSpec.BooleanValue rawMeatHungerEnabled;
+        public final ModConfigSpec.IntValue rawMeatHungerTicks;
+        public final ModConfigSpec.IntValue rawMeatHungerAmplifier;
+        public final ModConfigSpec.BooleanValue sleepPenaltyEnabled;
+        public final ModConfigSpec.IntValue sleepBlindnessTicks;
+        public final ModConfigSpec.IntValue sleepSlowTicks;
+        public final ModConfigSpec.BooleanValue ghastFireballCreeper;
 
         Common(ModConfigSpec.Builder b) {
             b.comment("猛男生存 - 通用设置").push("general");
@@ -225,13 +254,23 @@ public final class MSConfig {
 
             b.comment("【10】地狱门损坏").push("portal");
             portalBreakChance = b
-                    .comment("玩家穿过地狱门时，地狱门损坏的概率（0.5 = 二分之一）")
-                    .defineInRange("breakChance", 0.5D, 0.0D, 1.0D);
+                    .comment("玩家穿过地狱门时，地狱门损坏的概率（0.25 = 四分之一，即 1/4）",
+                             "损坏时出发侧与到达侧的门会一起碎")
+                    .defineInRange("breakChance", 0.25D, 0.0D, 1.0D);
             b.pop();
 
             b.comment("【11】末影人死亡生成末影螨").push("endermite");
             endermiteCount = b.comment("末影人死亡时生成的末影螨数量")
                     .defineInRange("count", 3, 0, 64);
+            b.pop();
+
+            b.comment("【35】末影珍珠落点生成末影螨").push("enderPearl");
+            enderPearlEndermiteCount = b
+                    .comment("玩家用末影珍珠传送后，在【落点】生成的末影螨数量（0 = 关闭）")
+                    .defineInRange("endermiteCount", 1, 0, 16);
+            enderPearlRespectPeaceful = b
+                    .comment("true = 和平难度下不生成（与原版一致）")
+                    .define("respectPeaceful", true);
             b.pop();
 
             b.comment("【12】玩家死亡生成僵尸").push("corpse");
@@ -258,12 +297,16 @@ public final class MSConfig {
                     .defineInRange("skeletonSpawnMultiplier", 0.25D, 0.0D, 100.0D);
             b.pop();
 
-            b.comment("【15】猪灵无视金装").push("piglin");
+            b.comment("【15】猪灵与僵尸猪灵靠近即敌对（与末影人相同）").push("piglin");
             piglinIgnoreGoldArmor = b
-                    .comment("true = 即使玩家穿戴金制装备，猪灵依然会攻击玩家")
+                    .comment("true = 即使玩家穿戴金制装备也会被【猪灵】激怒（默认）",
+                             "false = 穿金装时猪灵保持中立（恢复原版行为）",
+                             "僵尸猪灵不受此开关影响，一律主动敌对")
                     .define("ignoreGoldArmor", true);
-            piglinAngerRange = b.comment("猪灵在多远范围内会主动把玩家设为攻击目标")
-                    .defineInRange("angerRange", 16.0D, 1.0D, 64.0D);
+            piglinAngerRange = b
+                    .comment("玩家进入多少格内，猪灵与僵尸猪灵就会像末影人一样立刻把玩家设为攻击目标",
+                             "（默认 16 格，与末影人的激怒距离一致）")
+                    .defineInRange("angerRange", 16.0D, 0.5D, 64.0D);
             b.pop();
 
             b.comment("【17】幻术师加入灾厄巡逻队").push("illusioner");
@@ -302,8 +345,8 @@ public final class MSConfig {
 
             b.comment("【23】末影人激怒距离").push("enderman");
             endermanAngerRange = b
-                    .comment("玩家与末影人距离小于多少格时直接激怒末影人")
-                    .defineInRange("angerRange", 10.0D, 0.5D, 64.0D);
+                    .comment("玩家与末影人距离小于多少格时直接激怒末影人（默认 16 格）")
+                    .defineInRange("angerRange", 16.0D, 0.5D, 64.0D);
             b.pop();
 
             b.comment("【24】岩浆桶 / 水桶").push("bucket");
@@ -399,6 +442,110 @@ public final class MSConfig {
             giveWelcomeBook = b
                     .comment("true = 玩家第一次进入世界时，获得一本内容为本模组 README 的成书",
                              "（每个玩家只发一次，之后重进世界不会再发）")
+                    .define("enabled", true);
+            b.pop();
+
+            b.comment("【36】僵尸出生携带皮革帽子").push("zombieCap");
+            zombieLeatherCap = b
+                    .comment("true = 僵尸（含尸壳、溺尸等）出生时若头部为空，会戴上一顶皮革帽子")
+                    .define("enabled", true);
+            b.pop();
+
+            b.comment("【37】划船时获得饥饿").push("boatHunger");
+            boatHungerEnabled = b.comment("true = 玩家坐在船 / 木筏上时持续获得饥饿效果")
+                    .define("enabled", true);
+            boatHungerAmplifier = b.comment("饥饿等级（0 = 饥饿 I）")
+                    .defineInRange("amplifier", 0, 0, 255);
+            b.pop();
+
+            b.comment("【38】岩浆持续点燃周围方块顶面").push("lavaIgnite");
+            lavaIgniteEnabled = b
+                    .comment("true = 玩家附近的岩浆会不断尝试在四个相邻方块的上表面放火")
+                    .define("enabled", true);
+            lavaIgniteIntervalTicks = b
+                    .comment("检查间隔（刻）。越小烧得越凶，同时对性能压力越大")
+                    .defineInRange("intervalTicks", 20, 1, 1200);
+            lavaIgniteRange = b
+                    .comment("以玩家为中心扫描岩浆的水平半径（格）")
+                    .defineInRange("range", 5, 1, 16);
+            b.pop();
+
+            b.comment("【39】末影水晶免疫箭矢").push("endCrystal");
+            endCrystalArrowProof = b
+                    .comment("true = 箭矢无法摧毁末影水晶（三叉戟、近战与爆炸仍然有效）")
+                    .define("arrowProof", true);
+            b.pop();
+
+            b.comment("【40】下界炼药锅不能储水").push("netherCauldron");
+            netherNoWaterCauldron = b
+                    .comment("true = 在下界里无法用水桶给炼药锅装水（岩浆与细雪不受影响）")
+                    .define("noWater", true);
+            b.pop();
+
+            b.comment("【41】蜘蛛出生自带隐身").push("spiderInvisibility");
+            spiderInvisibilityEnabled = b.comment("true = 蜘蛛（含洞穴蜘蛛）出生时获得隐身效果")
+                    .define("enabled", true);
+            spiderInvisibilityTicks = b
+                    .comment("隐身持续时间（72000 刻 = 1 小时），会被持续补满")
+                    .defineInRange("durationTicks", 72000, 1, Integer.MAX_VALUE);
+            b.pop();
+
+            b.comment("【42】手持烈焰粉 / 烈焰棒会被点燃").push("blazeItems");
+            blazeItemsIgnite = b
+                    .comment("true = 手持烈焰粉或烈焰棒时持续被点燃（与手持岩浆桶一致）")
+                    .define("enabled", true);
+            b.pop();
+
+            b.comment("【44】末影人摧毁头部正前方的方块").push("endermanBreak");
+            endermanBreakBlocks = b
+                    .comment("true = 末影人会定期摧毁自己【头部朝向的正前方】的方块（不掉落物）")
+                    .define("enabled", true);
+            endermanBreakIntervalTicks = b
+                    .comment("尝试间隔（刻）。默认 40 刻 = 2 秒")
+                    .defineInRange("intervalTicks", 40, 1, 72000);
+            endermanBreakRange = b
+                    .comment("从眼睛沿视线往前探测的最大距离（格），找到第一个方块就摧毁它")
+                    .defineInRange("range", 3.0D, 0.5D, 8.0D);
+            b.pop();
+
+            b.comment("【43】女巫额外投掷的药水").push("witchPotion");
+            witchExtraPotionChance = b
+                    .comment("女巫投出的喷溅药水被替换为 凋零 / 盘丝 / 渗浆 / 虫蚀 的概率",
+                             "（0.0 = 关闭，1.0 = 每次都替换）")
+                    .defineInRange("extraPotionChance", 0.5D, 0.0D, 1.0D);
+            b.pop();
+
+            b.comment("【45】骷髅出生佩戴下界合金头盔").push("skeletonHelmet");
+            skeletonNetheriteHelmet = b
+                    .comment("true = 骷髅 / 流浪者 / 沼骸 / 凋灵骷髅出生时若头部为空，会戴上下界合金头盔")
+                    .define("enabled", true);
+            b.pop();
+
+            b.comment("【46】生肉会带来饥饿").push("rawMeatHunger");
+            rawMeatHungerEnabled = b
+                    .comment("true = 吃生肉（牛肉 / 猪排 / 鸡肉 / 羊肉 / 兔肉）会获得饥饿效果",
+                             "（生鱼不算肉，不受影响）")
+                    .define("enabled", true);
+            rawMeatHungerTicks = b
+                    .comment("饥饿持续时间（刻）。默认 600 刻 = 30 秒，与腐肉一致")
+                    .defineInRange("durationTicks", 600, 1, 72000);
+            rawMeatHungerAmplifier = b.comment("饥饿等级（0 = 饥饿 I，与腐肉一致）")
+                    .defineInRange("amplifier", 0, 0, 255);
+            b.pop();
+
+            b.comment("【47】睡醒后的惩罚").push("sleepPenalty");
+            sleepPenaltyEnabled = b
+                    .comment("true = 完成一次睡眠后，除生成幻翼外还会获得失明与缓慢")
+                    .define("enabled", true);
+            sleepBlindnessTicks = b.comment("失明持续时间（200 刻 = 10 秒）")
+                    .defineInRange("blindnessTicks", 200, 1, 72000);
+            sleepSlowTicks = b.comment("缓慢持续时间（400 刻 = 20 秒）")
+                    .defineInRange("slowTicks", 400, 1, 72000);
+            b.pop();
+
+            b.comment("【48】恶魂火球落点生成闪电苦力怕").push("ghastFireball");
+            ghastFireballCreeper = b
+                    .comment("true = 恶魂火球击中任何东西后，在落点生成一只【已点燃的闪电苦力怕】")
                     .define("enabled", true);
             b.pop();
 

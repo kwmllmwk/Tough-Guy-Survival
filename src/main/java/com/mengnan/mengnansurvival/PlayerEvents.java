@@ -201,6 +201,13 @@ public final class PlayerEvents {
             }
         }
 
+        // 【42】手持烈焰粉或烈焰棒同样会被点燃（与手持岩浆桶一致）
+        if (MSConfig.COMMON.blazeItemsIgnite.get()) {
+            if (isBlazeItem(main) || isBlazeItem(off)) {
+                player.setRemainingFireTicks(Math.max(player.getRemainingFireTicks(), 60));
+            }
+        }
+
         double spillChance = MSConfig.COMMON.waterBucketSpillChance.get();
         if (spillChance <= 0.0D || !player.isAlive() || !moved) {
             return;
@@ -224,6 +231,11 @@ public final class PlayerEvents {
         if (spillWater(player)) {
             inventory.setItem(slot, new ItemStack(Items.BUCKET));
         }
+    }
+
+    /** 判断物品是否为「会引火」的烈焰类物品。 */
+    private static boolean isBlazeItem(ItemStack stack) {
+        return stack.is(Items.BLAZE_POWDER) || stack.is(Items.BLAZE_ROD);
     }
 
     /** 在玩家脚下放出一格水源。 */
@@ -565,6 +577,15 @@ public final class PlayerEvents {
         if (dayTime >= 12000L) {
             return;
         }
+
+        // 【47】睡醒后的惩罚：失明 10 秒 + 缓慢 20 秒
+        if (MSConfig.COMMON.sleepPenaltyEnabled.get()) {
+            player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS,
+                    MSConfig.COMMON.sleepBlindnessTicks.get(), 0, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS,
+                    MSConfig.COMMON.sleepSlowTicks.get(), 0, false, true));
+        }
+
         spitPhantoms(player, MSConfig.COMMON.phantomsOnSleep.get());
     }
 
@@ -592,32 +613,79 @@ public final class PlayerEvents {
     }
 
     // ==========================================================
-    // 【10】穿过地狱门时按概率损坏
+    // 【10】穿过地狱门时按概率损坏（出发侧与到达侧的门一起碎）
     // ==========================================================
+
+    /**
+     * 记录玩家「传送前」所在的维度与位置。
+     *
+     * <p>PlayerChangedDimensionEvent 触发时玩家已经在另一侧了，
+     * 拿不到出发侧的坐标，因此必须提前在这个事件里记下来。</p>
+     */
+    private static final Map<UUID, PendingPortal> PENDING_PORTAL = new ConcurrentHashMap<>();
+
+    /** 待破坏的出发侧地狱门：维度 + 位置。 */
+    private record PendingPortal(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
+                                 BlockPos pos) {}
+
+    @SubscribeEvent
+    public static void onTravelToDimension(
+            net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        // 只在「涉及下界」的传送里记录，末地传送门不参与
+        var from = player.level().dimension();
+        var to = event.getDimension();
+        if (from != net.minecraft.world.level.Level.NETHER && to != net.minecraft.world.level.Level.NETHER) {
+            return;
+        }
+        PENDING_PORTAL.put(player.getUUID(), new PendingPortal(from, player.blockPosition()));
+    }
 
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
+        PendingPortal pending = PENDING_PORTAL.remove(player.getUUID());
+
+        // 只处理涉及下界的传送（末地传送门、末地折跃门不参与）
+        boolean involvesNether = event.getFrom() == net.minecraft.world.level.Level.NETHER
+                || event.getTo() == net.minecraft.world.level.Level.NETHER;
+        if (!involvesNether) {
+            return;
+        }
+
         double chance = MSConfig.COMMON.portalBreakChance.get();
         if (chance <= 0.0D || RNG.nextDouble() >= chance) {
             return;
         }
-        breakNearbyPortal(player);
+
+        // ---- 到达侧的门 ----
+        if (player.level() instanceof ServerLevel dest) {
+            breakPortalAround(dest, player.blockPosition());
+
+            // ---- 出发侧的门（在另一个维度里，通过服务器查回那个世界）----
+            if (pending != null) {
+                ServerLevel source = dest.getServer().getLevel(pending.dimension());
+                if (source != null) {
+                    breakPortalAround(source, pending.pos());
+                }
+            }
+        }
     }
 
-    /** 破坏玩家附近的地狱门方块（保留黑曜石框架）。 */
-    private static void breakNearbyPortal(ServerPlayer player) {
-        if (!(player.level() instanceof ServerLevel level)) {
-            return;
-        }
-        BlockPos center = player.blockPosition();
+    /** 破坏指定位置附近的地狱门方块（保留黑曜石框架）。 */
+    private static void breakPortalAround(ServerLevel level, BlockPos center) {
         int radius = 4;
         boolean broke = false;
         for (BlockPos pos : BlockPos.betweenClosed(
                 center.offset(-radius, -radius, -radius),
                 center.offset(radius, radius, radius))) {
+            if (!level.isLoaded(pos)) {
+                continue;
+            }
             BlockState state = level.getBlockState(pos);
             if (state.is(Blocks.NETHER_PORTAL)) {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
@@ -626,6 +694,49 @@ public final class PlayerEvents {
         }
         if (broke) {
             level.updateNeighborsAt(center, Blocks.NETHER_PORTAL, null);
+        }
+    }
+
+    // ==========================================================
+    // 【35】末影珍珠使用后，在落点生成末影螨
+    // ==========================================================
+
+    /**
+     * 末影珍珠把玩家传送过去时，在<b>落点</b>生成末影螨。
+     *
+     * <p>这个事件在真正传送之前触发，{@code event.getTarget()} 就是落点坐标，
+     * 因此直接在那里生成即可。</p>
+     *
+     * <p>顺带一提：原版那 5% 的末影螨是生成在玩家<b>起跳点</b>的（传送前的坐标），
+     * 本项要求的是落点，所以这里是独立实现、不受原版逻辑影响。</p>
+     */
+    @SubscribeEvent
+    public static void onEnderPearlTeleport(
+            net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl event) {
+        int count = MSConfig.COMMON.enderPearlEndermiteCount.get();
+        if (count <= 0) {
+            return;
+        }
+        ServerLevel level = event.getTargetLevel();
+        if (level == null) {
+            return;
+        }
+        // 和平难度下不生成（与原版保持一致）
+        if (MSConfig.COMMON.enderPearlRespectPeaceful.get()
+                && level.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL) {
+            return;
+        }
+
+        Vec3 target = event.getTarget();
+        for (int i = 0; i < count; i++) {
+            var mite = net.minecraft.world.entity.EntityTypes.ENDERMITE.create(
+                    level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+            if (mite == null) {
+                continue;
+            }
+            mite.snapTo(target.x, target.y, target.z,
+                    level.getRandom().nextFloat() * 360.0F, 0.0F);
+            level.addFreshEntity(mite);
         }
     }
 

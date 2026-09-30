@@ -27,8 +27,12 @@ import java.util.List;
  */
 public final class HomingProjectiles {
 
-    /** 三叉戟实体类（26.3 位于 world.entity.projectile 下）。 */
-    private static final String TRIDENT_CLASS = "net.minecraft.world.entity.projectile.ThrownTrident";
+    /**
+     * 三叉戟实体类名。
+     * 注意：26.3 里它位于 {@code world.entity.projectile.arrow} 包下（早期版本在上一层）。
+     * 包名写错会导致追踪对三叉戟完全失效，所以这里显式记下正确路径。
+     */
+    private static final String TRIDENT_CLASS = "net.minecraft.world.entity.projectile.arrow.ThrownTrident";
 
     private HomingProjectiles() {}
 
